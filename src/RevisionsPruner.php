@@ -23,7 +23,7 @@ class RevisionsPruner extends \WP_CLI_Command {
 	 * [--file=<file>]
 	 * : Use input CSV file. (stdin otherwise or if <file> does not exists)
 	 *
-	 * [--last=<number>]
+	 * [--keep-last=<number>]
 	 * : Keep at least <number> revisions.
 	 *
 	 * [--keep-hourly=<number>]
@@ -56,7 +56,7 @@ class RevisionsPruner extends \WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *      wp revisions list --format=csv --fields=ID,post_name,post_date_gmt --yes | wp revisions prune --keep-daily=1 --list
-	 *      wp revisions list --format=csv --fields=ID,post_name,post_date_gmt --yes | wp revisions prune --keep-hourly=2 --list=removed
+	 *      wp post list --post_type=revision --format=csv --fields=ID,post_name,post_date_gmt | wp revisions prune --keep-hourly=2 --keep-last=5 --list=removed
 	 *
 	 */
 	public function prune( $args, $assoc_args ) {
@@ -75,7 +75,7 @@ class RevisionsPruner extends \WP_CLI_Command {
 		}
 
 		$policy = [
-			'_last'        => isset( $assoc_args['last'] ) && is_numeric( $assoc_args['last'] ) ? intval( $assoc_args['last'] ) : false,
+			'_last'        => isset( $assoc_args['keep-last'] ) && is_numeric( $assoc_args['keep-last'] ) ? intval( $assoc_args['keep-last'] ) : false,
 			'_min_rev'     => isset( $assoc_args['keep-less-than-n-rev'] ) && is_numeric( $assoc_args['keep-less-than-n-rev'] ) ? intval( $assoc_args['keep-less-than-n-rev'] ) : false,
 			'_keep_before' => isset( $assoc_args['keep-before'] ) ? strtotime( $assoc_args['keep-before'] ) : false,
 			'_keep_after'  => isset( $assoc_args['keep-after'] ) ? strtotime( $assoc_args['keep-after'] ) : false,
@@ -126,6 +126,10 @@ class RevisionsPruner extends \WP_CLI_Command {
 		return $results;
 	}
 
+	/**
+	 * This logic (in particular the "--keep-last=<N>" assume revisions withint $results
+	 * are sort in the reverse chronological order (newest first)
+	 */
 	private static function blacklist_revisions( $results, $policy ) {
 
 		$policy_map = [
@@ -156,7 +160,7 @@ class RevisionsPruner extends \WP_CLI_Command {
 				'year'  => [],
 			];
 
-			$index = 0;
+			$last_kept = 0;
 			foreach ( $revisions as $revision ) {
 				list($date, $data) = $revision;
 				$id                = $data[0];
@@ -164,18 +168,18 @@ class RevisionsPruner extends \WP_CLI_Command {
 
 				if ( $policy['_keep_before'] && $date <= $policy['_keep_before'] ) {
 					WP_CLI::debug( "[keep-before] preserves $id" );
-					$index++;
 					continue;
 				}
 
 				if ( $policy['_keep_after'] && $date >= $policy['_keep_after'] ) {
-					WP_CLI::debug( "[keep-after] preserves $id and subsequent" );
-					break;
+					WP_CLI::debug( "[keep-after] preserves $id" );
+					continue;
 				}
 
-				if ( $policy['_last'] && count( $revisions ) - $index <= $policy['_last'] ) {
-					WP_CLI::debug( "[keep-last] preserves $id and subsequent" );
-					break;
+				if ( $policy['_last'] && $last_kept <= $policy['_last'] ) {
+					$last_kept++;
+					WP_CLI::debug( "[keep-last] preserves $id" );
+					continue;
 				}
 
 				foreach ( $policy_map as $policy_name => $policy_time_format ) {
@@ -202,7 +206,7 @@ class RevisionsPruner extends \WP_CLI_Command {
 					// If no (more) revision wanted. Drop this (and subsequents) revision.
 					// (And do not consider wider time intervals)
 					if ( ! $preserve && ( ! $up_to || count( $found[ $policy_name ] ) >= $policy[ $policy_name ] ) ) {
-						WP_CLI::debug( "$policy_name says remove $id" );
+						WP_CLI::debug( "[$policy_name] says remove $id" );
 						$remove[] = $id;
 						break;
 					}
@@ -210,8 +214,6 @@ class RevisionsPruner extends \WP_CLI_Command {
 					// Otherwise, preserve this one.
 					$found[ $policy_name ][] = $date;
 				}
-
-				$index++;
 			}
 		}
 

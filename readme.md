@@ -22,7 +22,7 @@ The CSV can be generated using:
 - wp revisions list --format=csv --fields=ID,post_name,post_date_gmt --yes
 
 ~~~
-wp revisions prune [--file=<file>] [--post_id=<post-id>] [--fields=<fields>] [--yes] [--format=<format>] [--file=<file>] [--last=<number>] [--keep-hourly=<number>] [--keep-daily=<number>] [--keep-weekly=<number>] [--keep-monthly=<number>] [--keep-yearly=<number>] [--keep-less-than-n-rev=<number>] [--keep-before=<yyyy-mm-dd>] [--keep-after=<yyyy-mm-dd>] [--list]
+wp revisions prune [--file=<file>] [--post_id=<post-id>] [--fields=<fields>] [--yes] [--format=<format>] [--file=<file>] [--keep-last=<number>] [--keep-hourly=<number>] [--keep-daily=<number>] [--keep-weekly=<number>] [--keep-monthly=<number>] [--keep-yearly=<number>] [--keep-less-than-n-rev=<number>] [--keep-before=<yyyy-mm-dd>] [--keep-after=<yyyy-mm-dd>] [--list]
 ~~~
 
 **OPTIONS**
@@ -30,7 +30,7 @@ wp revisions prune [--file=<file>] [--post_id=<post-id>] [--fields=<fields>] [--
 	[--file=<file>]
 	: Use input CSV file. (stdin otherwise or if <file> does not exists)
 
-	[--last=<number>]
+	[--keep-last=<number>]
 	: Keep at least <number> revisions.
 
 	[--keep-hourly=<number>]
