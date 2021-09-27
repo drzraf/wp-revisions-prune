@@ -176,7 +176,7 @@ class RevisionsPruner extends \WP_CLI_Command {
 					continue;
 				}
 
-				if ( $policy['_last'] && $last_kept <= $policy['_last'] ) {
+				if ( $policy['_last'] && $last_kept < $policy['_last'] ) {
 					$last_kept++;
 					WP_CLI::debug( "[keep-last] preserves $id" );
 					continue;
