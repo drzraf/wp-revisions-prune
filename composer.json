@@ -1,0 +1,52 @@
+{
+    "name": "drzraf/wp-revisions-prune",
+    "description": "Prune WP revisions",
+    "type": "wp-cli-package",
+    "authors": [
+	{ "name": "Raphaël Droz", "email": "raphael.droz@gmail.com" }
+    ],
+    "homepage": "https://github.com/drzraf/wp-revisions-prune",
+    "license": "MIT",
+    "require": {
+	"ext-json": "*",
+	"wp-cli/wp-cli": "^2.1"
+    },
+    "config": {
+	"platform": {
+	    "php": "5.4"
+	},
+	"process-timeout": 7200,
+	"sort-packages": true
+    },
+    "extra": {
+	"branch-alias": {
+	    "dev-master": "1.x-dev"
+	},
+	"bundled": false,
+	"commands": [
+	    "revisions prune"
+	]
+    },
+    "autoload": {
+	"psr-4": {
+	    "WP_CLI\\WpRevisionsPrune\\": "src/"
+	},
+	"files": [ "revisions-prune.php" ]
+    },
+    "require-dev": {
+	"wp-cli/wp-cli-tests": "^2.0.7"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+	"lint": "run-linter-tests",
+	"phpcs": "run-phpcs-tests",
+	"phpunit": "run-php-unit-tests",
+	"prepare-tests": "install-package-tests",
+	"test": [
+	    "@lint",
+	    "@phpcs",
+	    "@phpunit"
+	]
+    }
+}
