@@ -14,12 +14,12 @@ This package implements the following commands:
 Prune a list of revisions
 
 This command does not touch the database (not even attempt to read from it). Instead, it acts as a filter after a CSV list
-(in the following format: <ID>, <post_name>, <post_date>) and returns a pruned list of lines (or raw post ID) according to the
+(in the following format: `<ID>, <post_name>, <post_date>`) and returns a pruned list of lines (or raw post ID) according to the
 pruning "policy" specified in on the command line.
 
 The CSV can be generated using:
-- wp post list --post_type=revision --format=csv --fields=ID,post_name,post_date_gmt
-- wp revisions list --format=csv --fields=ID,post_name,post_date_gmt --yes
+- `wp post list --post_type=revision --format=csv --fields=ID,post_name,post_date_gmt`
+- `wp revisions list --format=csv --fields=ID,post_name,post_date_gmt --yes`
 
 ~~~
 wp revisions prune [--file=<file>] [--post_id=<post-id>] [--fields=<fields>] [--yes] [--format=<format>] [--file=<file>] [--keep-last=<number>] [--keep-hourly=<number>] [--keep-daily=<number>] [--keep-weekly=<number>] [--keep-monthly=<number>] [--keep-yearly=<number>] [--keep-less-than-n-rev=<number>] [--keep-before=<yyyy-mm-dd>] [--keep-after=<yyyy-mm-dd>] [--list]
